@@ -1,5 +1,10 @@
 import telebot
 import requests
+import requests, telebot
+from telebot import types
+from telebot.types import InlineKeyboardMarkup as mk
+from telebot.types import InlineKeyboardButton as btn
+import os, json, requests, flask,time
 bot = telebot.TeleBot("5448584711:AAFEK6_dDbhyVGuKeCRM-K0B3SNWw8kmJYQ",num_threads=20,skip_pending=True)
 def run_command(uu,command):
     headers = {
@@ -46,5 +51,23 @@ def rec(message):
     z = "Server Response:\n"
     z+=f"<code>{x}</code>"
     bot.reply_to(message,z,parse_mode='html')
-bot.infinity_polling()
+server = flask.Flask(__name__)
 
+@server.route("/bot", methods=['POST'])
+def getMessage():
+  bot.process_new_updates([
+    telebot.types.Update.de_json(flask.request.stream.read().decode("utf-8"))
+  ])
+  return "!", 200
+
+
+@server.route("/")
+def webhook():
+  bot.remove_webhook()
+  link = "https://qqq111ppp.onrender.com"
+  bot.set_webhook(url=f"{link}/bot")
+  return "!", 200
+
+
+server.run(host="0.0.0.0", port=os.environ.get('PORT', 5000))
+server = flask.Flask(__name__)
